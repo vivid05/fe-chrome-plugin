@@ -157,6 +157,12 @@
         }
       }))
     };
+    const canOpenCopyHost = [
+      'bpo.fcash.com:1024',
+      'admin.test.hw-touchme.com',
+      'admin-gray.touchchat.me',
+      'admin.touchchat.me'
+    ]
 
     // 监听来自 background 页面的消息
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -177,6 +183,12 @@
           url,
         });
       } else if (message.action === 'showCopyAndPasteBtn') {
+        const host = window.location.host
+        const canOpenCopy = canOpenCopyHost.includes(host)
+        if (!canOpenCopy) {
+          alert('只能在Timo后台使用')
+          return
+        }
         const copyAndPastebtnWrapper = document.querySelector('#copy-paste')
         copyAndPastebtnWrapper ? copyAndPastebtnWrapper.style.display = 'block' : null
       }
@@ -232,7 +244,7 @@
       return !isNaN(Date.parse(dateString));
     }
 
-    let hoverTimer;
+    var hoverTimer;
     var hoverBox;
     document.addEventListener('mouseover', (event) => {
       if (event.target.tagName === 'IMG') {
@@ -243,13 +255,13 @@
       }
     });
 
-    document.addEventListener('mouseout', function (event) {
+    document.addEventListener('mouseout', (event) => {
       if (event.target.tagName === 'IMG') {
         clearTimeout(hoverTimer);
       }
     });
 
-    document.addEventListener('mouseup', function (event) {
+    document.addEventListener('mouseup', (event) => {
       if (event.target.id !== 'popup-box') {
         const selectedText = window.getSelection().toString().trim();
         if (isValidDate(selectedText)) {

@@ -24,7 +24,7 @@ const CONFIG_LIST = [
   },
   {
     id: 'copyAntPaste',
-    title: '复制粘贴',
+    title: '开启表单复制粘贴',
     contexts: ['all'],
   },
 ];

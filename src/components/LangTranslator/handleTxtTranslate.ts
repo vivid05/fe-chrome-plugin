@@ -1,5 +1,4 @@
 import ajax from '@/api/ajax';
-import { rejects } from 'assert';
 import Axios from 'axios';
 import CryptoJS from 'crypto-js';
 

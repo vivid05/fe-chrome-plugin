@@ -6,7 +6,7 @@
     <div v-show="!showCompName.includes('Ctn')" class="m-main_ctn">
       <div :class="{ 'f-blur': showCompName }">
         <h1 :class="{ 'z-fold': logoFold }" class="f-tc j-logo_ctn f-ovhidden">
-          <img class="m-logo u-link" src="/icon.png" alt="icon" @click="toHome" />
+          <img class="m-logo u-link" src="/icon.png" alt="icon" />
         </h1>
         <section>
           <p class="u-c-middle g-mt50">
@@ -68,13 +68,42 @@
             </li>
             <li
               class="f-tc"
+              title="Base64编/解码"
               style="
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
               "
-              title="快速中英文翻译"
+              @click="showCompName = 'TheBase64'"
+            >
+              <svg
+                t="1691550924493"
+                class="icon"
+                viewBox="0 0 1505 1024"
+                version="1.1"
+                xmlns="http://www.w3.org/2000/svg"
+                p-id="8447"
+                width="45"
+                height="50"
+              >
+                <path
+                  d="M120.470588 120.470588v783.058824h1264.941177V120.470588H120.470588zM60.235294 0h1385.411765c33.129412 0 60.235294 27.105882 60.235294 60.235294v903.529412c0 33.129412-27.105882 60.235294-60.235294 60.235294H60.235294c-33.129412 0-60.235294-27.105882-60.235294-60.235294V60.235294C0 27.105882 27.105882 0 60.235294 0z m331.294118 331.294118h120.470588c33.129412 0 60.235294 27.105882 60.235294 60.235294s-27.105882 60.235294-60.235294 60.235294h-120.470588c-33.129412 0-60.235294-27.105882-60.235294-60.235294s27.105882-60.235294 60.235294-60.235294z m0 240.941176h120.470588c33.129412 0 60.235294 27.105882 60.235294 60.235294s-27.105882 60.235294-60.235294 60.235294h-120.470588c-33.129412 0-60.235294-27.105882-60.235294-60.235294s27.105882-60.235294 60.235294-60.235294z m331.294117-240.941176h120.470589c33.129412 0 60.235294 27.105882 60.235294 60.235294s-27.105882 60.235294-60.235294 60.235294h-120.470589c-33.129412 0-60.235294-27.105882-60.235294-60.235294s27.105882-60.235294 60.235294-60.235294z m0 240.941176h120.470589c33.129412 0 60.235294 27.105882 60.235294 60.235294s-27.105882 60.235294-60.235294 60.235294h-120.470589c-33.129412 0-60.235294-27.105882-60.235294-60.235294s27.105882-60.235294 60.235294-60.235294z m376.470589-90.352941c-42.164706 0-75.294118-33.129412-75.294118-75.294118s33.129412-75.294118 75.294118-75.294117 75.294118 33.129412 75.294117 75.294117-33.129412 75.294118-75.294117 75.294118z m0 210.823529c-42.164706 0-75.294118-33.129412-75.294118-75.294117s33.129412-75.294118 75.294118-75.294118 75.294118 33.129412 75.294117 75.294118-33.129412 75.294118-75.294117 75.294117z"
+                  p-id="8448"
+                  fill="#8795A8"
+                ></path>
+              </svg>
+              <span class="g-fs12">Base64编/解码</span>
+            </li>
+            <li
+              class="f-tc"
+              style="
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+              "
+              title="图片编辑"
               @click="showCompName = 'ImageEdit'"
             >
               <svg
@@ -122,7 +151,6 @@ import { defineComponent } from 'vue';
 
 import { getUrlParam } from '@/utils';
 import { getMarkTree, jumpAction } from '@/utils/chrome';
-import ajax from '@/api/ajax';
 import { DEFAULT_SEARCH_LIST } from '@/constant';
 
 import CompMap from '@/components/';
@@ -183,13 +211,6 @@ export default defineComponent({
      */
     toPostMan() {
       jumpAction('index.html?type=postman');
-    },
-
-    /**
-     * 去fe-tools主页
-     */
-    toHome() {
-      jumpAction('https://github.com/MichealWayne/fe-tools');
     },
 
     /**
