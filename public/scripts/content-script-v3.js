@@ -215,13 +215,13 @@
     function showTimestampHoverBox(x, y, timestamp) {
       hideTimestampHoverBox();
       const hoverBox = createPopupBox(x, y)
-      hoverBox.textContent = "Timestamp: " + timestamp;
+      hoverBox.textContent = 'Timestamp: ' + timestamp;
       document.body.appendChild(hoverBox);
-      hoverBox.addEventListener("mouseout", hideTimestampHoverBox);
+      hoverBox.addEventListener('mouseout', hideTimestampHoverBox);
     }
 
     function hideTimestampHoverBox() {
-      const hoverBox = document.querySelector("#popup-box");
+      const hoverBox = document.querySelector('#popup-box');
       if (hoverBox) {
         hoverBox.remove();
       }
@@ -234,10 +234,10 @@
 
     let hoverTimer;
     var hoverBox;
-    document.addEventListener('mouseover', function (event) {
+    document.addEventListener('mouseover', (event) => {
       if (event.target.tagName === 'IMG') {
         const imageUrl = event.target.src;
-        hoverTimer = setTimeout(function () {
+        hoverTimer = setTimeout(() => {
           hoverBox = createHoverBox(event.clientX, event.clientY, imageUrl);
         }, 1000);
       }
@@ -249,7 +249,7 @@
       }
     });
 
-    document.addEventListener("mouseup", function (event) {
+    document.addEventListener('mouseup', function (event) {
       if (event.target.id !== 'popup-box') {
         const selectedText = window.getSelection().toString().trim();
         if (isValidDate(selectedText)) {
@@ -262,7 +262,7 @@
     })
 
     function loadScript() {
-      const injectedScript = document.createElement("script");
+      const injectedScript = document.createElement('script');
       const file = chrome.runtime.getURL('page.js')
       injectedScript.src = file
       document.documentElement.appendChild(injectedScript);

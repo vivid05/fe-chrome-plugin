@@ -1,8 +1,3 @@
-/**
- * @author Wayne
- * @Date 2022-11-27 17:45:33
- * @LastEditTime 2023-07-09 14:12:40
- */
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import * as path from 'path';
@@ -35,6 +30,12 @@ export default defineConfig({
         target: 'https://fanyi.youdao.com/',
         changeOrigin: true,
         rewrite: (path: string) => path.replace(/^\/api/, ''),
+      },
+      '/its': {
+        target: 'https://itrans.xf-yun.com/v1/',
+        secure: false,
+        changeOrigin: true,
+        rewrite: (path: string) => path.replace(/^\/its/, ''),
       },
     },
   },

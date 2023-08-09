@@ -57,6 +57,13 @@
           点击上传图片<br />
           <em class="g-fs12">(*.jpg/*.png/*.gif格式)</em>
         </p>
+        <em
+          class="_close_kat5x_7 u-icon icon-close u-link g-pa close"
+          title="点击重置图片"
+          @click.stop="back"
+        >
+          <icon-reset />
+        </em>
       </div>
     </template>
   </div>
@@ -74,6 +81,13 @@ import IconReset from '../ImageCompressor/IconReset.vue';
 import 'cropperjs/dist/cropper.css';
 import { handleInputUploadImageFile } from '@/utils/image';
 import { nextTick, onUnmounted, ref } from 'vue';
+
+defineProps({
+  back: {
+    type: Function,
+    default: () => {},
+  },
+});
 
 const img = ref();
 const imageUrl = ref('');
@@ -163,7 +177,7 @@ const onReset = () => {
 }
 .main {
   position: relative;
-  width: 60%;
+  width: 100%;
   height: 100%;
 }
 .img-wrapper {
@@ -178,7 +192,7 @@ const onReset = () => {
   width: 20%;
 }
 .btns {
-  margin-top: 20px;
+  margin-bottom: 10px;
 }
 .btns > button {
   background: #fff;
@@ -199,15 +213,15 @@ const onReset = () => {
   border-color: #28a745;
 }
 .info {
-  margin-top: 20px;
+  margin: 20px 0 10px 0;
   width: 350px;
   display: flex;
   justify-content: space-between;
 }
 .close {
   position: absolute;
-  top: -15px;
-  right: -15px;
+  top: 0px;
+  right: 0px;
   z-index: 9;
   display: flex;
   justify-content: center;

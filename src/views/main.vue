@@ -175,15 +175,6 @@ export default defineComponent({
       this.setSearchResult();
     }
     getMarkTree((list: any) => (this.markList = list));
-    ajax
-      .getFeTools()
-      .then((data: any) => {
-        const list = this.handleFEToolsList(data.list);
-        this.feToolsList = list;
-      })
-      .catch((e: Error) => {
-        alert(e?.message || '链接信息获取失败');
-      });
   },
 
   methods: {
