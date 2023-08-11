@@ -2,7 +2,11 @@
   <div class="main" @click.stop="stopPropagation">
     <section>
       <p style="margin-bottom: 10px">请输入要进行 Base64 编码或解码的字符</p>
-      <textarea v-model="originTxt" class="u-textarea"></textarea>
+      <textarea
+        v-model="originTxt"
+        style="height: 130px; min-height: unset"
+        class="u-textarea"
+      ></textarea>
     </section>
     <section class="btns">
       <button class="primary" style="margin-right: 10px" @click="onDecode">解码</button>
@@ -38,11 +42,15 @@ const onDecode = () => {
   if (!originTxt.value) {
     alert('请先输入');
   }
-  const text = decodeURIComponent(originTxt.value)
-    .replace(/\\r\\n/g, '\\n')
-    .replace(/\\n/g, '\n');
-  const result = base64decode(text, false, 'text');
-  resultTxt.value = JSON.parse(result);
+  try {
+    const text = decodeURIComponent(originTxt.value)
+      .replace(/\\r\\n/g, '\\n')
+      .replace(/\\n/g, '\n');
+    const result = base64decode(text, false, 'text');
+    resultTxt.value = JSON.parse(result);
+  } catch (error) {
+    alert('不是合法的base64');
+  }
 };
 
 const stopPropagation = () => {

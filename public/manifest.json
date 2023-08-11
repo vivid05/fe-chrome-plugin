@@ -32,6 +32,8 @@
       "matches": [
         "http://bpo.fcash.com:1024/*",
         "http://admin.test.hw-touchme.com/*",
+        "http://admin2.test.hw-touchme.com/*",
+        "http://admin3.test.hw-touchme.com/*",
         "https://admin-gray.touchchat.me/*",
         "https://admin.touchchat.me/*"
       ]

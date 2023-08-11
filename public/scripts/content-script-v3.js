@@ -160,6 +160,8 @@
     const canOpenCopyHost = [
       'bpo.fcash.com:1024',
       'admin.test.hw-touchme.com',
+      'admin2.test.hw-touchme.com',
+      'admin3.test.hw-touchme.com',
       'admin-gray.touchchat.me',
       'admin.touchchat.me'
     ]
@@ -191,6 +193,8 @@
         }
         const copyAndPastebtnWrapper = document.querySelector('#copy-paste')
         copyAndPastebtnWrapper ? copyAndPastebtnWrapper.style.display = 'block' : null
+      } else if (message.action === 'showImgLink') {
+        isOpenImgShowLink = !isOpenImgShowLink
       }
     });
 
@@ -247,8 +251,10 @@
 
     var hoverTimer;
     var hoverBox;
+    // 图片快捷显示链接开关
+    var isOpenImgShowLink = false
     document.addEventListener('mouseover', (event) => {
-      if (event.target.tagName === 'IMG') {
+      if (event.target.tagName === 'IMG' && isOpenImgShowLink) {
         const imageUrl = event.target.src;
         hoverTimer = setTimeout(() => {
           hoverBox = createHoverBox(event.clientX, event.clientY, imageUrl);
@@ -257,13 +263,13 @@
     });
 
     document.addEventListener('mouseout', (event) => {
-      if (event.target.tagName === 'IMG') {
+      if (event.target.tagName === 'IMG' && isOpenImgShowLink) {
         clearTimeout(hoverTimer);
       }
     });
 
     document.addEventListener('mouseup', (event) => {
-      if (event.target.id !== 'popup-box') {
+      if (event.target.id !== 'popup-box' && isOpenImgShowLink) {
         const selectedText = window.getSelection().toString().trim();
         if (isValidDate(selectedText)) {
           const timestamp = new Date(selectedText).getTime();

@@ -21,6 +21,11 @@ const CONFIG_LIST = [
     title: '开启表单复制粘贴',
     contexts: ['all'],
   },
+  {
+    id: 'showImgLink',
+    title: '开/关快捷获取图片和时间戳功能',
+    contexts: ['all'],
+  },
 ];
 
 // create QRcode
@@ -59,6 +64,11 @@ chrome.contextMenus.onClicked.addListener((data, tab) => {
     chrome.tabs.sendMessage(tab.id, {
       action: 'showCopyAndPasteBtn',
       type: 'copyAntPaste',
+    });
+  } else if (data.menuItemId === 'showImgLink') {
+    chrome.tabs.sendMessage(tab.id, {
+      action: 'showImgLink',
+      type: 'showImgLink',
     });
   }
 });
