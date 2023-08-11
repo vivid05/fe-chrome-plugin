@@ -14,7 +14,7 @@
               id="search"
               v-model="keywords"
               class="m-s_input g-fs16 u-w300"
-              placeholder="请输入关键词或二维码生成地址"
+              placeholder="请输入关键词"
               autocomplete="off"
               type="text"
               autofocus
@@ -39,15 +39,7 @@
           </ul>
         </section>
         <section class="g-mt50 g-center">
-          <ul class="m-others g-fs14 u-pt10 u-j-middle">
-            <li
-              class="f-tc"
-              title="输入框地址URL或当前页面URL生成二维码"
-              @click="showCompName = 'QRCode'"
-            >
-              <em class="u-icon iconfont icon-erweima g-fs36"></em>
-              <span class="g-fs12">生成二维码</span>
-            </li>
+          <ul class="m-others g-fs14 u-pt10 u-j-middle" style="justify-content: center">
             <li
               class="f-tc"
               title="本地或在线图片压缩/转为base64字符串"
@@ -61,9 +53,9 @@
               <span class="g-fs12">色值换算</span>
             </li>
           </ul>
-          <ul class="m-others g-fs14 u-pt30 u-j-middle">
+          <ul class="m-others g-fs14 u-pt30 u-j-middle" style="justify-content: center">
             <li class="f-tc" title="快速中英文翻译" @click="showCompName = 'LangTranslator'">
-              <em class="u-icon iconfont icon-fanyi g-center g-fs36"></em>
+              <em class="u-icon iconfont icon-fanyi g-center g-fs36" style="height: 47px"></em>
               <span class="g-fs12">快速翻译</span>
             </li>
             <li

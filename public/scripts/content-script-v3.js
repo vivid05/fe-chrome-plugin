@@ -227,7 +227,7 @@
     function showTimestampHoverBox(x, y, timestamp) {
       hideTimestampHoverBox();
       const hoverBox = createPopupBox(x, y)
-      hoverBox.textContent = 'Timestamp: ' + timestamp;
+      hoverBox.textContent = '时间戳: ' + timestamp;
       document.body.appendChild(hoverBox);
       hoverBox.addEventListener('mouseout', hideTimestampHoverBox);
     }
@@ -241,7 +241,8 @@
 
 
     function isValidDate(dateString) {
-      return !isNaN(Date.parse(dateString));
+      const dateTimeRegex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
+      return dateTimeRegex.test(dateString);
     }
 
     var hoverTimer;
@@ -251,7 +252,7 @@
         const imageUrl = event.target.src;
         hoverTimer = setTimeout(() => {
           hoverBox = createHoverBox(event.clientX, event.clientY, imageUrl);
-        }, 1000);
+        }, 2000);
       }
     });
 

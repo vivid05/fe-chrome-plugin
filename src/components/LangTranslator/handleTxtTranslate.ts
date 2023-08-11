@@ -37,7 +37,7 @@ function getWebsocketUrl(): Promise<string> {
     const apiKey = API_KEY;
     const apiSecret = API_SECRET;
     let url = IS_DEV ? '/its' : 'https://itrans.xf-yun.com/v1/its';
-    const host = location.host;
+    const host = 'itrans.xf-yun.com';
     const date = new Date().toUTCString();
     const algorithm = 'hmac-sha256';
     const headers = 'host date request-line';

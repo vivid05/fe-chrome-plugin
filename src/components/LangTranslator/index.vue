@@ -44,7 +44,6 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-
 import { AnyFunc } from '@/types/index';
 import { getUrlParam } from '@/utils';
 import handleTxtTranslate, { translate } from './handleTxtTranslate';

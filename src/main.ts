@@ -1,8 +1,3 @@
-/**
- * @author Wayne
- * @Date 2022-11-27 17:45:33
- * @LastEditTime 2023-07-09 14:15:05
- */
 import { createApp } from 'vue';
 
 import 'moo-css-base/pc.css';

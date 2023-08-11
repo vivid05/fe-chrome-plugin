@@ -37,6 +37,12 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path: string) => path.replace(/^\/its/, ''),
       },
+      '/chat': {
+        target: 'ws://spark-api.xf-yun.com/v1.1/',
+        secure: false,
+        changeOrigin: true,
+        rewrite: (path: string) => path.replace(/^\/chat/, ''),
+      },
     },
   },
 });

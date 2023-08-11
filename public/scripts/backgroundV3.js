@@ -12,12 +12,6 @@ const handleTabCreate = url => {
 
 const CONFIG_LIST = [
   {
-    id: 'qrCode',
-    title: '当前URL生成二维码',
-    contexts: ['all'],
-  },
-
-  {
     id: 'translate',
     title: '快速翻译',
     contexts: ['all'],

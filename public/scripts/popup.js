@@ -1,10 +1,4 @@
-/**
- * fe-tools Chrome plugin
- * @author Wayne
- * @time 2019.10.08
- */
-
-const HOME_URL = 'https://github.com/MichealWayne/fe-tools';
+const HOME_URL = '';
 const DEFAULT_SEARCH_LIST = ['mdn', 'github', 'npmjs', 'caniuse', 'stackoverflow', 'baidu'];
 
 let FEToolsData = null; // 请求插件数据
