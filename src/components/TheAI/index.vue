@@ -1,13 +1,16 @@
 <template>
-  <div @click.stop="stopPropagation"></div>
+  <div @click.stop="stopPropagation">{{ resultTxt }}</div>
 </template>
 
 <script>
 export default {
-  name: 'TheAi',
+  name: 'TheAI',
 };
 </script>
 <script setup>
+import { onMounted, ref } from 'vue';
+import CryptoJS from 'crypto-js';
+
 const stopPropagation = () => {
   return false;
 };
@@ -31,35 +34,37 @@ const getWebsocketUrl = () => {
   });
 };
 
-const url = await getWebsocketUrl();
-const params = {
-  header: {
-    app_id: '3f32ea2e',
-    uid: '1',
-  },
-  parameter: {
-    chat: {
-      domain: 'general',
-      temperature: 0.5,
-      max_tokens: 1024,
+const resultTxt = ref('');
+onMounted(async () => {
+  const url = await getWebsocketUrl();
+  const params = {
+    header: {
+      app_id: '3f32ea2e',
+      uid: '1',
     },
-  },
-  payload: {
-    message: {
-      text: [{ role: 'user', content: '你好' }],
+    parameter: {
+      chat: {
+        domain: 'general',
+        temperature: 0.5,
+        max_tokens: 1024,
+      },
     },
-  },
-};
-const socket = new WebSocket(url);
-socket.addEventListener('open', () => {
-  console.log('WebSocket连接已打开');
-  socket.send(JSON.stringify(params));
-});
-socket.addEventListener('message', event => {
-  const data = JSON.parse(event.data);
-  const result = data.payload.choices.text[0].content;
-  // this.resultTxt = this.resultTxt.concat(result);
-  console.log(result);
+    payload: {
+      message: {
+        text: [{ role: 'user', content: '你好' }],
+      },
+    },
+  };
+  const socket = new WebSocket(url);
+  socket.addEventListener('open', () => {
+    console.log('WebSocket连接已打开');
+    socket.send(JSON.stringify(params));
+  });
+  socket.addEventListener('message', event => {
+    const data = JSON.parse(event.data);
+    const result = data.payload.choices.text[0].content;
+    resultTxt.value = resultTxt.value.concat(result);
+  });
 });
 </script>
 

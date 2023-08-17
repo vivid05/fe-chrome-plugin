@@ -280,12 +280,16 @@
       }
     })
 
-    function loadScript() {
+    function loadScript(jsFile = 'page.js') {
       const injectedScript = document.createElement('script');
-      const file = chrome.runtime.getURL('page.js')
+      const file = chrome.runtime.getURL(jsFile)
       injectedScript.src = file
       document.documentElement.appendChild(injectedScript);
     }
     loadScript()
+    const host = window.location.host
+    if (host.includes('feishu.cn')) {
+      loadScript('feishu.js')
+    }
   }
 });

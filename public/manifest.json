@@ -37,6 +37,10 @@
         "https://admin-gray.touchchat.me/*",
         "https://admin.touchchat.me/*"
       ]
+    },
+    {
+      "resources": ["feishu.js"],
+      "matches": ["*://*.feishu.cn/*"]
     }
   ]
 }

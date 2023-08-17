@@ -52,6 +52,10 @@
               <em class="u-icon iconfont icon-chanyexietong g-fs36"></em>
               <span class="g-fs12">色值换算</span>
             </li>
+            <!-- <li class="f-tc" title="rgb/hxb/hex色值换算" @click="showCompName = 'TheAI'">
+              <em class="u-icon iconfont icon-chanyexietong g-fs36"></em>
+              <span class="g-fs12">AIGC</span>
+            </li> -->
           </ul>
           <ul class="m-others g-fs14 u-pt30 u-j-middle" style="justify-content: center">
             <li class="f-tc" title="快速中英文翻译" @click="showCompName = 'LangTranslator'">
