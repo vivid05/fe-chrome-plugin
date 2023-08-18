@@ -54,7 +54,7 @@
             </li>
             <li
               class="f-tc"
-              title="rgb/hxb/hex色值换算"
+              title="人工智能生成内容"
               style="
                 display: flex;
                 flex-direction: column;
