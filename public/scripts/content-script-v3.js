@@ -287,9 +287,5 @@
       document.documentElement.appendChild(injectedScript);
     }
     loadScript()
-    const host = window.location.host
-    if (host.includes('feishu.cn')) {
-      loadScript('feishu.js')
-    }
   }
 });

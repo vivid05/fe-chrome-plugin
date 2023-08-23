@@ -29,14 +29,19 @@
         </svg>
       </div>
       <div class="input-box">
-        <textarea v-model="userInput" placeholder="你想问什么?" @keyup.enter="onSend" />
-        <div
+        <textarea
+          ref="textarea"
+          v-model="userInput"
+          placeholder="你想问什么?"
+          @keyup.enter="onSend"
+        />
+        <button
           class="btn"
           :class="{ 'btn--disable': isLoading || !userInput.trim() }"
           @click="onSend"
         >
           发送
-        </div>
+        </button>
       </div>
     </div>
   </div>
@@ -48,8 +53,15 @@ export default {
 };
 </script>
 <script setup>
-import { ref, nextTick } from 'vue';
+import { ref, nextTick, onMounted } from 'vue';
 import CryptoJS from 'crypto-js';
+
+const textarea = ref();
+onMounted(() => {
+  nextTick(() => {
+    textarea.value.focus();
+  });
+});
 
 const stopPropagation = () => {
   return false;
