@@ -8,7 +8,13 @@
             <p class="self">{{ item.content }}</p>
           </div>
         </template>
-        <p v-if="resultTxt" class="ai">{{ resultTxt }}</p>
+        <p
+          v-if="resultTxt"
+          :style="{ '--display': isHandleText ? 'inline-block' : 'none' }"
+          class="ai cur"
+        >
+          {{ resultTxt }}
+        </p>
       </div>
       <div v-if="isLoading" class="loading">
         <svg
@@ -71,12 +77,12 @@ const getWebsocketUrl = () => {
   return new Promise(resolve => {
     const apiKey = '42b7e6264723824af07e90f3e5756b1d';
     const apiSecret = 'MDU3MGUyMTlmMWRjZTVmNTUxYTExMWNl';
-    let url = 'ws://spark-api.xf-yun.com/v1.1/chat';
+    let url = 'ws://spark-api.xf-yun.com/v2.1/chat';
     const host = 'spark-api.xf-yun.com';
     const date = new Date().toUTCString();
     const algorithm = 'hmac-sha256';
     const headers = 'host date request-line';
-    const signatureOrigin = `host: ${host}\ndate: ${date}\nGET /v1.1/chat HTTP/1.1`;
+    const signatureOrigin = `host: ${host}\ndate: ${date}\nGET /v2.1/chat HTTP/1.1`;
     const signatureSha = CryptoJS.HmacSHA256(signatureOrigin, apiSecret);
     const signature = CryptoJS.enc.Base64.stringify(signatureSha);
     const authorizationOrigin = `api_key="${apiKey}", algorithm="${algorithm}", headers="${headers}", signature="${signature}"`;
@@ -86,6 +92,7 @@ const getWebsocketUrl = () => {
   });
 };
 
+const isFinished = ref(false);
 const isLoading = ref(false);
 const chatBox = ref();
 const chatList = ref([]);
@@ -98,7 +105,7 @@ const params = ref({
   },
   parameter: {
     chat: {
-      domain: 'general',
+      domain: 'generalv2',
       temperature: 0.5,
       max_tokens: 1024,
     },
@@ -110,16 +117,20 @@ const params = ref({
   },
 });
 
+const updateScroll = () => {
+  nextTick(() => {
+    const scrollHeight = chatBox.value.scrollHeight;
+    chatBox.value.scrollTop = scrollHeight;
+  });
+};
+
 const onSend = async () => {
   if (!userInput.value.trim() || isLoading.value) {
     return;
   }
   chatList.value.push({ role: 'user', content: userInput.value });
   params.value.payload.message.text = chatList.value;
-  nextTick(() => {
-    const scrollHeight = chatBox.value.scrollHeight;
-    chatBox.value.scrollTop = scrollHeight;
-  });
+  updateScroll();
   const url = await getWebsocketUrl();
   let socket = null;
   isLoading.value = true;
@@ -131,17 +142,44 @@ const onSend = async () => {
   socket.addEventListener('message', event => {
     const data = JSON.parse(event.data);
     const result = data.payload.choices.text[0].content;
-    resultTxt.value = resultTxt.value.concat(result);
-    nextTick(() => {
-      const scrollHeight = chatBox.value.scrollHeight;
-      chatBox.value.scrollTop = scrollHeight;
-    });
+    isFinished.value = data.header.status === 2;
+    displayText(result);
   });
   socket.addEventListener('close', () => {
-    chatList.value.push({ role: 'assistant', content: resultTxt.value });
-    resultTxt.value = '';
     isLoading.value = false;
   });
+};
+
+let displayInterval;
+let currentText = '';
+let charIndex = 0;
+
+const displayText = newText => {
+  currentText += newText;
+
+  if (!displayInterval) {
+    displayInterval = setInterval(displayCharacter, 20);
+  }
+};
+
+const isHandleText = ref(false);
+const displayCharacter = () => {
+  isHandleText.value = true;
+  if (charIndex < currentText.length) {
+    resultTxt.value += currentText[charIndex];
+    updateScroll();
+    charIndex++;
+  } else {
+    if (isFinished.value) {
+      chatList.value.push({ role: 'assistant', content: resultTxt.value });
+      resultTxt.value = '';
+      isHandleText.value = false;
+    }
+    clearInterval(displayInterval);
+    displayInterval = null;
+    currentText = '';
+    charIndex = 0;
+  }
 };
 </script>
 
@@ -172,6 +210,32 @@ const onSend = async () => {
   box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 0.5px, rgba(0, 0, 0, 0.024) 0px 0px 5px,
     rgba(0, 0, 0, 0.05) 0px 1px 2px;
   margin-bottom: 20px;
+}
+.cur {
+  position: relative;
+}
+.cur::after {
+  content: '';
+  height: 22px;
+  width: 3px;
+  position: absolute;
+  background-color: #000;
+  display: var(--display);
+  font-size: 16px;
+  line-height: 22px;
+  animation: flashing 1s infinite;
+  transition: all 0.1s linear;
+}
+@keyframes flashing {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 .self-box {
   width: 100%;
