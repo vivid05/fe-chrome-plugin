@@ -77,12 +77,12 @@ const getWebsocketUrl = () => {
   return new Promise(resolve => {
     const apiKey = '42b7e6264723824af07e90f3e5756b1d';
     const apiSecret = 'MDU3MGUyMTlmMWRjZTVmNTUxYTExMWNl';
-    let url = 'ws://spark-api.xf-yun.com/v2.1/chat';
+    let url = 'ws://spark-api.xf-yun.com/v3.1/chat';
     const host = 'spark-api.xf-yun.com';
     const date = new Date().toUTCString();
     const algorithm = 'hmac-sha256';
     const headers = 'host date request-line';
-    const signatureOrigin = `host: ${host}\ndate: ${date}\nGET /v2.1/chat HTTP/1.1`;
+    const signatureOrigin = `host: ${host}\ndate: ${date}\nGET /v3.1/chat HTTP/1.1`;
     const signatureSha = CryptoJS.HmacSHA256(signatureOrigin, apiSecret);
     const signature = CryptoJS.enc.Base64.stringify(signatureSha);
     const authorizationOrigin = `api_key="${apiKey}", algorithm="${algorithm}", headers="${headers}", signature="${signature}"`;
@@ -105,7 +105,7 @@ const params = ref({
   },
   parameter: {
     chat: {
-      domain: 'generalv2',
+      domain: 'generalv3',
       temperature: 0.5,
       max_tokens: 1024,
     },
@@ -218,7 +218,9 @@ const displayCharacter = () => {
   content: '';
   height: 22px;
   width: 3px;
+  margin-left: 3px;
   position: absolute;
+  bottom: 8px;
   background-color: #000;
   display: var(--display);
   font-size: 16px;

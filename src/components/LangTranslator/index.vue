@@ -133,22 +133,15 @@ export default defineComponent({
     },
 
     onTranslate(text: string) {
-      if (
-        (this.langFrom === 'cn' && this.langTo === 'en') ||
-        (this.langFrom === 'en' && this.langTo === 'cn')
-      ) {
-        this.handleTranslate(text);
-      } else {
-        translate(this.langFrom, this.langTo, text)
-          .then((res: string) => {
-            this.resultTxt = res;
-          })
-          .catch(e => {
-            alert('翻译失败');
-            console.error(e);
-            this.resultTxt = '';
-          });
-      }
+      translate(this.langFrom, this.langTo, text)
+        .then((res: string) => {
+          this.resultTxt = res;
+        })
+        .catch(e => {
+          alert('翻译失败');
+          console.error(e);
+          this.resultTxt = '';
+        });
     },
 
     /**
