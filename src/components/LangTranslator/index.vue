@@ -8,14 +8,6 @@
     <section>
       <div style="display: flex">
         <p>原文（<a class="u-link" s-cr_blue @click="reset">清空</a>）</p>
-        <p
-          v-for="item in langList"
-          :key="item.value"
-          :class="['lang-item', langFrom === item.value ? 'lang-item--active' : '']"
-          @click="selectLang('from', item.value)"
-        >
-          {{ item.label }}
-        </p>
       </div>
       <textarea
         v-model="originTxt"
@@ -31,7 +23,7 @@
           v-for="item in langList"
           :key="item.value"
           :class="['lang-item', langTo === item.value ? 'lang-item--active' : '']"
-          @click="selectLang('to', item.value)"
+          @click="selectLang(item.value)"
         >
           {{ item.label }}
         </p>
@@ -47,6 +39,7 @@ import { defineComponent } from 'vue';
 import { AnyFunc } from '@/types/index';
 import { getUrlParam } from '@/utils';
 import handleTxtTranslate, { translate } from './handleTxtTranslate';
+import { franc } from 'franc-min';
 
 export default defineComponent({
   name: 'LangTranslator',
@@ -71,8 +64,14 @@ export default defineComponent({
 
       // 定时器
       timer: -1 as unknown,
-      langFrom: 'cn',
       langTo: 'en',
+      langMap: {
+        cmn: 'cn',
+        eng: 'en',
+        ind: 'id',
+        arb: 'ar',
+        por: 'pt',
+      },
       langList: [
         { label: '中文', value: 'cn' },
         { label: '英语', value: 'en' },
@@ -124,16 +123,20 @@ export default defineComponent({
       e.target.select();
     },
 
-    selectLang(type: string, lang: string) {
-      if ((type === 'from' && lang === this.langTo) || (type === 'to' && lang === this.langFrom)) {
-        alert('不能同语种翻译');
-        return;
-      }
-      type === 'from' ? (this.langFrom = lang) : (this.langTo = lang);
+    selectLang(lang: string) {
+      this.langTo = lang;
     },
 
     onTranslate(text: string) {
-      translate(this.langFrom, this.langTo, text)
+      const langFrom = franc(text, { minLength: 3, only: ['cmn', 'eng', 'ind', 'arb', 'por'] });
+      const langFromFormart = this.langMap[langFrom] || 'en';
+      if (langFrom === 'cmn' && this.langTo === 'cn') {
+        this.langTo = 'en';
+      }
+      if (langFrom !== 'cmn') {
+        this.langTo = 'cn';
+      }
+      translate(langFromFormart, this.langTo, text)
         .then((res: string) => {
           this.resultTxt = res;
         })

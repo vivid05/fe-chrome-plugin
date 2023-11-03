@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import * as path from 'path';
 
-const DEV_PORT = 8080;
+const DEV_PORT = 8082;
 
 // https://vitejs.dev/config/
 export default defineConfig({

@@ -29,6 +29,7 @@
     "@vueuse/core": "^8.2.0",
     "axios": "^0.26.1",
     "cropperjs": "^1.5.13",
+    "franc-min": "^6.1.0",
     "moo-css-base": "0.9.6",
     "pinia": "^2.0.12",
     "vue": "^3.2.25",
