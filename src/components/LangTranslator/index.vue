@@ -40,6 +40,7 @@ import { AnyFunc } from '@/types/index';
 import { getUrlParam } from '@/utils';
 import handleTxtTranslate, { translate } from './handleTxtTranslate';
 import { franc } from 'franc-min';
+import Axios from 'axios';
 
 export default defineComponent({
   name: 'LangTranslator',
@@ -65,19 +66,14 @@ export default defineComponent({
       // 定时器
       timer: -1 as unknown,
       langTo: 'en',
-      langMap: {
-        cmn: 'cn',
-        eng: 'en',
-        ind: 'id',
-        arb: 'ar',
-        por: 'pt',
-      },
       langList: [
-        { label: '中文', value: 'cn' },
+        { label: '中文', value: 'zh' },
         { label: '英语', value: 'en' },
-        { label: '印尼语', value: 'id' },
-        { label: '阿语', value: 'ar' },
+        { label: '阿语', value: 'ara' },
         { label: '葡语', value: 'pt' },
+        // { label: '印尼语', value: 'id' },
+        // { label: '印地语', value: 'hi' },
+        // { label: '土耳其语', value: 'tr' },
       ],
     };
   },
@@ -128,15 +124,7 @@ export default defineComponent({
     },
 
     onTranslate(text: string) {
-      const langFrom = franc(text, { minLength: 3, only: ['cmn', 'eng', 'ind', 'arb', 'por'] });
-      const langFromFormart = this.langMap[langFrom] || 'en';
-      if (langFrom === 'cmn' && this.langTo === 'cn') {
-        this.langTo = 'en';
-      }
-      if (langFrom !== 'cmn') {
-        this.langTo = 'cn';
-      }
-      translate(langFromFormart, this.langTo, text)
+      translate(this.langTo, text)
         .then((res: string) => {
           this.resultTxt = res;
         })

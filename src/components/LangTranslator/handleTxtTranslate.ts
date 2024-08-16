@@ -51,44 +51,30 @@ function getWebsocketUrl(): Promise<string> {
   });
 }
 
-export function translate(from: string, to: string, text: string) {
+function generateRandomString(length = 5) {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    result += characters[randomIndex];
+  }
+  return result;
+}
+
+export function translate(to: string, text: string) {
+  const salt = generateRandomString();
+  const str1 = '20240816002124970' + text + salt + 'lbLCGrPdCPggh36Ra8P4';
+  const sign = CryptoJS.MD5(str1).toString();
   return new Promise(async (resolve, reject) => {
-    const textString = CryptoJS.enc.Utf8.parse(text);
-    const textBase64 = CryptoJS.enc.Base64.stringify(textString);
-    const params = {
-      header: {
-        app_id: '3f32ea2e',
-        status: 3,
-      },
-      parameter: {
-        its: {
-          from,
-          to,
-          result: {},
-        },
-      },
-      payload: {
-        input_data: {
-          encoding: 'utf8',
-          status: 3,
-          text: textBase64,
-        },
-      },
-    };
-    const url: string = await getWebsocketUrl();
-    Axios.post(url, JSON.stringify(params), {
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-      },
-    })
+    const api = IS_DEV ? '/translate' : 'https://fanyi-api.baidu.com/api/trans/vip/translate'
+    const url = `${api}?q=${text}&from=auto&to=${to}&appid=20240816002124970&salt=${salt}&sign=${sign}`;
+    Axios.get(url)
       .then((res: any) => {
         try {
-          const resultBase64 = res.data.payload.result.text;
-          const resultObj = JSON.parse(
-            CryptoJS.enc.Base64.parse(resultBase64).toString(CryptoJS.enc.Utf8)
-          );
-          console.log({ resultObj });
-          resolve(resultObj.trans_result.dst);
+          const result = res.data.trans_result
+          if (result && result.length) {
+            resolve(result[0].dst)
+          }
         } catch (error) {
           reject(error);
         }

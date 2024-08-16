@@ -27,9 +27,9 @@ export default defineConfig({
         rewrite: (path: string) => path.replace(/^\/api/, ''),
       },
       '/translate': {
-        target: 'https://fanyi.youdao.com/',
+        target: 'https://fanyi-api.baidu.com/api/trans/vip/translate',
         changeOrigin: true,
-        rewrite: (path: string) => path.replace(/^\/api/, ''),
+        rewrite: (path: string) => path.replace(/^\/translate/, ''),
       },
       '/its': {
         target: 'https://itrans.xf-yun.com/v1/',
