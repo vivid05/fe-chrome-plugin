@@ -124,6 +124,10 @@ export default defineComponent({
     },
 
     onTranslate(text: string) {
+      const langFrom = franc(text, { minLength: 2, only: ['cmn', 'eng', 'ind', 'arb', 'por'] });
+      if (langFrom !== 'cmn') {
+        this.langTo = 'zh';
+      }
       translate(this.langTo, text)
         .then((res: string) => {
           this.resultTxt = res;
