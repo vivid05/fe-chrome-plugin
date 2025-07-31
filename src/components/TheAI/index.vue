@@ -1,5 +1,26 @@
 <template>
   <div @click.stop="stopPropagation">
+    <!-- 顶部模型选择器 -->
+    <div class="model-selector-top">
+      <div class="model-selector" @click="showModelSelector = !showModelSelector">
+        <span class="model-name">{{ getCurrentModel().name }}</span>
+        <span class="model-arrow" :class="{ 'model-arrow--up': showModelSelector }">▼</span>
+      </div>
+      
+      <!-- 模型选择下拉菜单 -->
+      <div v-if="showModelSelector" class="model-dropdown" @click.stop>
+        <div 
+          v-for="model in aiModels" 
+          :key="model.id"
+          class="model-option"
+          :class="{ 'model-option--selected': selectedModel === model.id }"
+          @click="selectModel(model.id)"
+        >
+          <span class="model-option-name">{{ model.name }}</span>
+        </div>
+      </div>
+    </div>
+    
     <div class="chat">
       <div ref="chatBox" class="chat-box">
         <template v-for="(item, index) in chatList" :key="index">
@@ -41,13 +62,15 @@
           placeholder="你想问什么?"
           @keyup.enter="onSend"
         />
-        <button
-          class="btn"
-          :class="{ 'btn--disable': isLoading || !userInput.trim() }"
-          @click="onSend"
-        >
-          发送
-        </button>
+        <div class="input-controls">
+          <button
+            class="btn"
+            :class="{ 'btn--disable': isLoading || !userInput.trim() }"
+            @click="onSend"
+          >
+            发送
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -72,9 +95,40 @@ const openai = new OpenAI({
 });
 
 const textarea = ref();
+
+// 模型选择相关
+const selectedModel = ref('Qwen/Qwen3-235B-A22B-Instruct-2507');
+const showModelSelector = ref(false);
+
+// 可用的AI模型列表
+const aiModels = [
+  {
+    id: 'zai-org/GLM-4.5',
+    name: 'GLM-4.5'
+  },
+  {
+    id: 'Qwen/Qwen3-235B-A22B-Instruct-2507',
+    name: 'Qwen3-235B'
+  },
+  {
+    id: 'moonshotai/Kimi-K2-Instruct',
+    name: 'Kimi-K2'
+  }
+];
+
 onMounted(() => {
   nextTick(() => {
     textarea.value.focus();
+  });
+
+  // 点击外部关闭模型选择器
+  document.addEventListener('click', (event) => {
+    const modelSelector = document.querySelector('.model-selector');
+    const modelDropdown = document.querySelector('.model-dropdown');
+    if (modelSelector && !modelSelector.contains(event.target) && 
+        modelDropdown && !modelDropdown.contains(event.target)) {
+      showModelSelector.value = false;
+    }
   });
 });
 
@@ -133,6 +187,17 @@ const updateScroll = () => {
   });
 };
 
+// 获取当前选中的模型信息
+const getCurrentModel = () => {
+  return aiModels.find(model => model.id === selectedModel.value) || aiModels[0];
+};
+
+// 选择模型
+const selectModel = (modelId) => {
+  selectedModel.value = modelId;
+  showModelSelector.value = false;
+};
+
 // 新的AI问答函数使用SiliconFlow API
 const chatWithSiliconFlow = async messages => {
   try {
@@ -152,7 +217,7 @@ const chatWithSiliconFlow = async messages => {
     ];
 
     const completion = await openai.chat.completions.create({
-      model: 'moonshotai/Kimi-K2-Instruct',
+      model: selectedModel.value,
       messages: messagesWithSystem,
       temperature: 0.7,
       max_tokens: 4096,
@@ -295,6 +360,7 @@ const displayCharacter = () => {
     rgba(0, 0, 0, 0.05) 0px 1px 2px;
   margin-bottom: 20px;
 }
+
 .cur {
   position: relative;
 }
@@ -341,6 +407,7 @@ const displayCharacter = () => {
 .input-box {
   position: absolute;
   bottom: 20px;
+  display: flex;
 }
 .input-box textarea {
   background-color: #fff;
@@ -385,5 +452,100 @@ const displayCharacter = () => {
   background-color: #b3e19d;
   border-color: #b3e19d;
   cursor: not-allowed;
+}
+
+/* 顶部模型选择器样式 */
+.model-selector-top {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+}
+
+/* 模型选择器样式 */
+.input-controls {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.model-selector {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 140px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.model-selector:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.model-name {
+  font-size: 14px;
+  color: #333;
+  margin-right: 5px;
+}
+
+.model-arrow {
+  font-size: 12px;
+  color: #666;
+  transition: transform 0.2s ease;
+}
+
+.model-arrow--up {
+  transform: rotate(180deg);
+}
+
+.model-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 10px;
+  min-width: 150px;
+}
+
+.model-option {
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+}
+
+.model-option:last-child {
+  border-bottom: none;
+}
+
+.model-option:hover {
+  background-color: #f8f9fa;
+}
+
+.model-option--selected {
+  background-color: #e3f2fd;
+  border-left: 3px solid #2196f3;
+}
+
+.model-option-name {
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
 }
 </style>
