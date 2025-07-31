@@ -28,7 +28,19 @@
           {{ item.label }}
         </p>
       </div>
-      <textarea v-model="resultTxt" class="u-textarea" @click.stop="textFocus"></textarea>
+      <div style="position: relative">
+        <textarea
+          v-model="resultTxt"
+          class="u-textarea"
+          placeholder="翻译结果"
+          :disabled="isTranslating"
+          @click.stop="textFocus"
+        ></textarea>
+        <div v-if="isTranslating" class="loading-overlay">
+          <div class="loading-spinner"></div>
+          <span class="loading-text">翻译中...</span>
+        </div>
+      </div>
     </section>
     <p v-if="inPopup" class="u-link g-mt10 f-tc g-fs14" s-cr_blue @click.stop="back">返回主页</p>
   </div>
@@ -40,7 +52,6 @@ import { AnyFunc } from '@/types/index';
 import { getUrlParam } from '@/utils';
 import handleTxtTranslate, { translate } from './handleTxtTranslate';
 import { franc } from 'franc-min';
-import Axios from 'axios';
 
 export default defineComponent({
   name: 'LangTranslator',
@@ -60,6 +71,9 @@ export default defineComponent({
       // 译文
       resultTxt: '',
 
+      // 翻译中状态
+      isTranslating: false,
+
       // 在窗口内
       inPopup: getUrlParam('type') !== 'translate',
 
@@ -67,13 +81,15 @@ export default defineComponent({
       timer: -1 as unknown,
       langTo: 'en',
       langList: [
-        { label: '中文', value: 'zh' },
-        { label: '英语', value: 'en' },
-        { label: '阿语', value: 'ara' },
-        { label: '葡语', value: 'pt' },
-        // { label: '印尼语', value: 'id' },
-        // { label: '印地语', value: 'hi' },
-        // { label: '土耳其语', value: 'tr' },
+        { label: 'cn', value: 'zh' },
+        { label: 'en', value: 'en' },
+        { label: 'ar', value: 'ara' },
+        { label: 'pt', value: 'pt' },
+        { label: 'id', value: 'id' },
+        { label: 'tr', value: 'tr' },
+        { label: 'fil', value: 'fil' },
+        { label: 'ms', value: 'ms' },
+        { label: 'es', value: 'es' },
       ],
     };
   },
@@ -121,21 +137,36 @@ export default defineComponent({
 
     selectLang(lang: string) {
       this.langTo = lang;
+      if (this.originTxt.trim()) {
+        this.onTranslate(this.originTxt);
+      }
     },
 
     onTranslate(text: string) {
-      const langFrom = franc(text, { minLength: 2, only: ['cmn', 'eng', 'ind', 'arb', 'por'] });
+      if (this.isTranslating) return; // 防止重复请求
+
+      const langFrom = franc(text, {
+        minLength: 2,
+        only: ['cmn', 'eng', 'ind', 'arb', 'por', 'tur', 'spa'],
+      });
       if (langFrom !== 'cmn') {
         this.langTo = 'zh';
       }
+
+      this.isTranslating = true;
+      this.resultTxt = ''; // 清空之前的结果
+
       translate(this.langTo, text)
-        .then((res: string) => {
-          this.resultTxt = res;
+        .then((res: unknown) => {
+          this.resultTxt = res as string;
         })
         .catch(e => {
           alert('翻译失败');
           console.error(e);
           this.resultTxt = '';
+        })
+        .finally(() => {
+          this.isTranslating = false;
         });
     },
 
@@ -165,5 +196,48 @@ export default defineComponent({
   font-size: 15px;
   font-weight: bold;
   color: #8f57ff;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border-radius: 4px;
+}
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #8f57ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 8px;
+}
+
+.loading-text {
+  font-size: 12px;
+  color: #666;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.u-textarea:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
 }
 </style>

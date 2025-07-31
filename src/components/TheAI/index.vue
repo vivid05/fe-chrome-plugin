@@ -61,6 +61,15 @@ export default {
 <script setup>
 import { ref, nextTick, onMounted } from 'vue';
 import CryptoJS from 'crypto-js';
+import OpenAI from 'openai';
+
+// SiliconFlow AI配置
+const AI_API_TOKEN = import.meta.env.VITE_AI_API_TOKEN;
+const openai = new OpenAI({
+  baseURL: 'https://api.siliconflow.cn/v1/',
+  apiKey: AI_API_TOKEN,
+  dangerouslyAllowBrowser: true,
+});
 
 const textarea = ref();
 onMounted(() => {
@@ -124,30 +133,102 @@ const updateScroll = () => {
   });
 };
 
+// 新的AI问答函数使用SiliconFlow API
+const chatWithSiliconFlow = async messages => {
+  try {
+    // 构建包含系统提示词的消息数组
+    const systemMessage = {
+      role: 'system',
+      content:
+        '你是一个友好、有趣的AI助手。请在回复中适当使用emoji表情来增强表达效果，让对话更加生动有趣。根据内容情感和语境选择合适的emoji，但不要过度使用。保持专业且友好的语气。',
+    };
+
+    const messagesWithSystem = [
+      systemMessage,
+      ...messages.map(msg => ({
+        role: msg.role === 'user' ? 'user' : 'assistant',
+        content: msg.content,
+      })),
+    ];
+
+    const completion = await openai.chat.completions.create({
+      model: 'moonshotai/Kimi-K2-Instruct',
+      messages: messagesWithSystem,
+      temperature: 0.7,
+      max_tokens: 4096,
+      stream: true,
+    });
+
+    let fullResponse = '';
+
+    for await (const chunk of completion) {
+      const content = chunk.choices[0]?.delta?.content || '';
+      if (content) {
+        fullResponse += content;
+        displayText(content);
+      }
+    }
+
+    // 标记完成状态
+    isFinished.value = true;
+    // 确保显示完最后的文本
+    if (!displayInterval && fullResponse) {
+      displayText('');
+    }
+
+    return fullResponse;
+  } catch (error) {
+    console.error('SiliconFlow AI请求失败:', error);
+    throw error;
+  }
+};
+
 const onSend = async () => {
   if (!userInput.value.trim() || isLoading.value) {
     return;
   }
+
   chatList.value.push({ role: 'user', content: userInput.value });
-  params.value.payload.message.text = chatList.value;
   updateScroll();
-  const url = await getWebsocketUrl();
-  let socket = null;
   isLoading.value = true;
-  socket = new WebSocket(url);
-  socket.addEventListener('open', () => {
-    socket.send(JSON.stringify(params.value));
-    userInput.value = '';
-  });
-  socket.addEventListener('message', event => {
-    const data = JSON.parse(event.data);
-    const result = data.payload.choices.text[0].content;
-    isFinished.value = data.header.status === 2;
-    displayText(result);
-  });
-  socket.addEventListener('close', () => {
-    isLoading.value = false;
-  });
+  isFinished.value = false; // 重置完成状态
+  userInput.value = '';
+
+  try {
+    // 首先尝试使用SiliconFlow AI API
+    await chatWithSiliconFlow(chatList.value);
+  } catch (aiError) {
+    console.warn('SiliconFlow AI请求失败，回退到原WebSocket接口:', aiError);
+
+    // 回退到原有的WebSocket接口
+    try {
+      params.value.payload.message.text = chatList.value;
+      const url = await getWebsocketUrl();
+      let socket = null;
+
+      socket = new WebSocket(url);
+      socket.addEventListener('open', () => {
+        socket.send(JSON.stringify(params.value));
+      });
+      socket.addEventListener('message', event => {
+        const data = JSON.parse(event.data);
+        const result = data.payload.choices.text[0].content;
+        isFinished.value = data.header.status === 2;
+        displayText(result);
+      });
+      socket.addEventListener('close', () => {
+        isLoading.value = false;
+      });
+      socket.addEventListener('error', () => {
+        isLoading.value = false;
+        alert('AI服务暂时不可用，请稍后再试');
+      });
+    } catch (wsError) {
+      console.error('WebSocket连接也失败:', wsError);
+      isLoading.value = false;
+      alert('AI服务暂时不可用，请稍后再试');
+    }
+  }
 };
 
 let displayInterval;
@@ -170,10 +251,13 @@ const displayCharacter = () => {
     updateScroll();
     charIndex++;
   } else {
-    if (isFinished.value) {
-      chatList.value.push({ role: 'assistant', content: resultTxt.value });
+    if (isFinished.value || currentText.length === 0) {
+      if (resultTxt.value) {
+        chatList.value.push({ role: 'assistant', content: resultTxt.value });
+      }
       resultTxt.value = '';
       isHandleText.value = false;
+      isLoading.value = false; // 确保loading状态结束
     }
     clearInterval(displayInterval);
     displayInterval = null;
