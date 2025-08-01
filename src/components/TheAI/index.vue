@@ -24,18 +24,18 @@
     <div class="chat">
       <div ref="chatBox" class="chat-box">
         <template v-for="(item, index) in chatList" :key="index">
-          <p v-if="item.role === 'assistant'" class="ai">{{ item.content }}</p>
+          <div v-if="item.role === 'assistant'" class="ai" v-html="renderMarkdown(item.content)"></div>
           <div v-else class="self-box">
             <p class="self">{{ item.content }}</p>
           </div>
         </template>
-        <p
+        <div
           v-if="resultTxt"
           :style="{ '--display': isHandleText ? 'inline-block' : 'none' }"
           class="ai cur"
+          v-html="renderMarkdown(resultTxt)"
         >
-          {{ resultTxt }}
-        </p>
+        </div>
       </div>
       <div v-if="isLoading" class="loading">
         <svg
@@ -82,9 +82,10 @@ export default {
 };
 </script>
 <script setup>
-import { ref, nextTick, onMounted } from 'vue';
+import { ref, nextTick, onMounted, computed } from 'vue';
 import CryptoJS from 'crypto-js';
 import OpenAI from 'openai';
+import MarkdownIt from 'markdown-it';
 
 // SiliconFlow AI配置
 const AI_API_TOKEN = import.meta.env.VITE_AI_API_TOKEN;
@@ -96,8 +97,15 @@ const openai = new OpenAI({
 
 const textarea = ref();
 
+// 初始化markdown-it
+const md = new MarkdownIt({
+  html: true,
+  linkify: true,
+  typographer: true
+});
+
 // 模型选择相关
-const selectedModel = ref('Qwen/Qwen3-235B-A22B-Instruct-2507');
+const selectedModel = ref('moonshotai/Kimi-K2-Instruct');
 const showModelSelector = ref(false);
 
 // 可用的AI模型列表
@@ -309,6 +317,11 @@ const displayText = newText => {
 };
 
 const isHandleText = ref(false);
+// 渲染markdown
+const renderMarkdown = (text) => {
+  return md.render(text);
+};
+
 const displayCharacter = () => {
   isHandleText.value = true;
   if (charIndex < currentText.length) {
@@ -359,6 +372,94 @@ const displayCharacter = () => {
   box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 0.5px, rgba(0, 0, 0, 0.024) 0px 0px 5px,
     rgba(0, 0, 0, 0.05) 0px 1px 2px;
   margin-bottom: 20px;
+}
+
+/* Markdown样式 */
+.ai h1, .ai h2, .ai h3, .ai h4, .ai h5, .ai h6 {
+  margin: 0.5em 0;
+  font-weight: bold;
+}
+
+.ai h1 { font-size: 1.5em; }
+.ai h2 { font-size: 1.3em; }
+.ai h3 { font-size: 1.1em; }
+
+.ai p {
+  margin: 0.5em 0;
+  line-height: 1.5;
+}
+
+.ai code {
+  background-color: #f1f3f4;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+.ai pre {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 12px;
+  overflow-x: auto;
+  margin: 0.5em 0;
+}
+
+.ai pre code {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+}
+
+.ai blockquote {
+  border-left: 4px solid #ddd;
+  margin: 0.5em 0;
+  padding-left: 12px;
+  color: #666;
+}
+
+.ai ul, .ai ol {
+  margin: 0.5em 0;
+  padding-left: 20px;
+}
+
+.ai li {
+  margin: 0.2em 0;
+}
+
+.ai strong {
+  font-weight: bold;
+}
+
+.ai em {
+  font-style: italic;
+}
+
+.ai a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.ai a:hover {
+  text-decoration: underline;
+}
+
+.ai table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.5em 0;
+}
+
+.ai th, .ai td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.ai th {
+  background-color: #f2f2f2;
+  font-weight: bold;
 }
 
 .cur {
