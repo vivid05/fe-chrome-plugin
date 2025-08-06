@@ -1,16 +1,23 @@
 <template>
-  <div @click.stop="stopPropagation">
+  <div style="width: 100%" @click.stop="stopPropagation">
     <!-- 圆形折叠模型选择器 -->
     <div class="model-selector-circle">
-      <div 
-        class="model-circle" 
-        @click="showModelSelector = !showModelSelector"
+      <div
+        class="model-circle"
         :title="getCurrentModel().name"
         :class="{ 'model-circle--expanded': showModelSelector }"
+        @click="showModelSelector = !showModelSelector"
       >
         <span class="model-icon">🤖</span>
-        <span v-if="showModelSelector" class="model-name-expanded">{{ getCurrentModel().name }}</span>
-        <span v-if="showModelSelector" class="toggle-arrow" :class="{ 'toggle-arrow--open': showModelSelector }">▼</span>
+        <span v-if="showModelSelector" class="model-name-expanded">{{
+          getCurrentModel().name
+        }}</span>
+        <span
+          v-if="showModelSelector"
+          class="toggle-arrow"
+          :class="{ 'toggle-arrow--open': showModelSelector }"
+          >▼</span
+        >
       </div>
 
       <!-- 模型选择下拉菜单 -->
