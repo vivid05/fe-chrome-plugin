@@ -35,7 +35,7 @@ const AI_API_TOKEN = import.meta.env.VITE_AI_API_TOKEN;
 const openai = new OpenAI({
   baseURL: 'https://api.siliconflow.cn/v1/',
   apiKey: AI_API_TOKEN,
-  dangerouslyAllowBrowser: true
+  dangerouslyAllowBrowser: true,
 });
 
 // 语言映射，将简写转换为完整语言名称
@@ -57,7 +57,7 @@ async function translateWithAI(targetLang: string, text: string): Promise<string
     const targetLanguage = LANG_MAP[targetLang] || '英文';
 
     const completion = await openai.chat.completions.create({
-      model: 'Qwen/Qwen3-235B-A22B-Instruct-2507',
+      model: 'moonshotai/Kimi-K2-Instruct',
       messages: [
         {
           role: 'system',

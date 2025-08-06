@@ -16,27 +16,5 @@
   "homepage_url": "https://www.feishu.cn/invitation/page/add_contact/?token=314s193d-15aa-4d9f-beed-34890838c767&amp;unique_id=15gELVC3fwqBJpSv-Z1vNw==",
   "permissions": ["contextMenus", "tabs", "bookmarks", "webRequest", "storage", "scripting"],
   "host_permissions": ["*://*/*"],
-  "omnibox": { "keyword": "fe" },
-  "background": {
-    "service_worker": "scripts/backgroundV3.js"
-  },
-  "content_scripts": [
-    {
-      "matches": ["http://*/*", "https://*/*", "<all_urls>"],
-      "js": ["scripts/content-script-v3.js"]
-    }
-  ],
-  "web_accessible_resources": [
-    {
-      "resources": ["page.js"],
-      "matches": [
-        "http://bpo.fcash.com:1024/*",
-        "http://admin.test.hw-touchme.com/*",
-        "http://admin2.test.hw-touchme.com/*",
-        "http://admin3.test.hw-touchme.com/*",
-        "https://admin-gray.touchchat.me/*",
-        "https://admin.touchchat.me/*"
-      ]
-    }
-  ]
+  "omnibox": { "keyword": "fe" }
 }

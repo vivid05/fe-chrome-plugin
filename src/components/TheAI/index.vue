@@ -1,30 +1,40 @@
 <template>
   <div @click.stop="stopPropagation">
-    <!-- 顶部模型选择器 -->
-    <div class="model-selector-top">
-      <div class="model-selector" @click="showModelSelector = !showModelSelector">
-        <span class="model-name">{{ getCurrentModel().name }}</span>
-        <span class="model-arrow" :class="{ 'model-arrow--up': showModelSelector }">▼</span>
+    <!-- 圆形折叠模型选择器 -->
+    <div class="model-selector-circle">
+      <div 
+        class="model-circle" 
+        @click="showModelSelector = !showModelSelector"
+        :title="getCurrentModel().name"
+        :class="{ 'model-circle--expanded': showModelSelector }"
+      >
+        <span class="model-icon">🤖</span>
+        <span v-if="showModelSelector" class="model-name-expanded">{{ getCurrentModel().name }}</span>
+        <span v-if="showModelSelector" class="toggle-arrow" :class="{ 'toggle-arrow--open': showModelSelector }">▼</span>
       </div>
-      
+
       <!-- 模型选择下拉菜单 -->
-      <div v-if="showModelSelector" class="model-dropdown" @click.stop>
-        <div 
-          v-for="model in aiModels" 
+      <div v-if="showModelSelector" class="model-dropdown-circle" @click.stop>
+        <div
+          v-for="model in aiModels"
           :key="model.id"
-          class="model-option"
-          :class="{ 'model-option--selected': selectedModel === model.id }"
+          class="model-option-circle"
+          :class="{ 'model-option-circle--selected': selectedModel === model.id }"
           @click="selectModel(model.id)"
         >
-          <span class="model-option-name">{{ model.name }}</span>
+          {{ model.name }}
         </div>
       </div>
     </div>
-    
+
     <div class="chat">
       <div ref="chatBox" class="chat-box">
         <template v-for="(item, index) in chatList" :key="index">
-          <div v-if="item.role === 'assistant'" class="ai" v-html="renderMarkdown(item.content)"></div>
+          <div
+            v-if="item.role === 'assistant'"
+            class="ai"
+            v-html="renderMarkdown(item.content)"
+          ></div>
           <div v-else class="self-box">
             <p class="self">{{ item.content }}</p>
           </div>
@@ -34,8 +44,7 @@
           :style="{ '--display': isHandleText ? 'inline-block' : 'none' }"
           class="ai cur"
           v-html="renderMarkdown(resultTxt)"
-        >
-        </div>
+        ></div>
       </div>
       <div v-if="isLoading" class="loading">
         <svg
@@ -101,7 +110,7 @@ const textarea = ref();
 const md = new MarkdownIt({
   html: true,
   linkify: true,
-  typographer: true
+  typographer: true,
 });
 
 // 模型选择相关
@@ -112,16 +121,16 @@ const showModelSelector = ref(false);
 const aiModels = [
   {
     id: 'zai-org/GLM-4.5',
-    name: 'GLM-4.5'
+    name: 'GLM-4.5',
   },
   {
     id: 'Qwen/Qwen3-235B-A22B-Instruct-2507',
-    name: 'Qwen3-235B'
+    name: 'Qwen3-235B',
   },
   {
     id: 'moonshotai/Kimi-K2-Instruct',
-    name: 'Kimi-K2'
-  }
+    name: 'Kimi-K2',
+  },
 ];
 
 onMounted(() => {
@@ -130,11 +139,15 @@ onMounted(() => {
   });
 
   // 点击外部关闭模型选择器
-  document.addEventListener('click', (event) => {
+  document.addEventListener('click', event => {
     const modelSelector = document.querySelector('.model-selector');
     const modelDropdown = document.querySelector('.model-dropdown');
-    if (modelSelector && !modelSelector.contains(event.target) && 
-        modelDropdown && !modelDropdown.contains(event.target)) {
+    if (
+      modelSelector &&
+      !modelSelector.contains(event.target) &&
+      modelDropdown &&
+      !modelDropdown.contains(event.target)
+    ) {
       showModelSelector.value = false;
     }
   });
@@ -201,7 +214,7 @@ const getCurrentModel = () => {
 };
 
 // 选择模型
-const selectModel = (modelId) => {
+const selectModel = modelId => {
   selectedModel.value = modelId;
   showModelSelector.value = false;
 };
@@ -318,7 +331,7 @@ const displayText = newText => {
 
 const isHandleText = ref(false);
 // 渲染markdown
-const renderMarkdown = (text) => {
+const renderMarkdown = text => {
   return md.render(text);
 };
 
@@ -375,14 +388,25 @@ const displayCharacter = () => {
 }
 
 /* Markdown样式 */
-.ai h1, .ai h2, .ai h3, .ai h4, .ai h5, .ai h6 {
+.ai h1,
+.ai h2,
+.ai h3,
+.ai h4,
+.ai h5,
+.ai h6 {
   margin: 0.5em 0;
   font-weight: bold;
 }
 
-.ai h1 { font-size: 1.5em; }
-.ai h2 { font-size: 1.3em; }
-.ai h3 { font-size: 1.1em; }
+.ai h1 {
+  font-size: 1.5em;
+}
+.ai h2 {
+  font-size: 1.3em;
+}
+.ai h3 {
+  font-size: 1.1em;
+}
 
 .ai p {
   margin: 0.5em 0;
@@ -419,7 +443,8 @@ const displayCharacter = () => {
   color: #666;
 }
 
-.ai ul, .ai ol {
+.ai ul,
+.ai ol {
   margin: 0.5em 0;
   padding-left: 20px;
 }
@@ -451,7 +476,8 @@ const displayCharacter = () => {
   margin: 0.5em 0;
 }
 
-.ai th, .ai td {
+.ai th,
+.ai td {
   border: 1px solid #ddd;
   padding: 8px;
   text-align: left;
@@ -555,98 +581,160 @@ const displayCharacter = () => {
   cursor: not-allowed;
 }
 
-/* 顶部模型选择器样式 */
-.model-selector-top {
+/* 圆形折叠模型选择器样式 */
+.model-selector-circle {
   position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
+  top: 8px;
+  left: 8px;
   z-index: 1000;
 }
 
-/* 模型选择器样式 */
+.model-circle {
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(200, 200, 200, 0.8);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(4px);
+  width: 24px;
+  height: 24px;
+  justify-content: center;
+  overflow: hidden;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  will-change: transform, width, border-radius, padding;
+}
+
+.model-circle--expanded {
+  border-radius: 12px;
+  width: auto;
+  padding: 4px 8px;
+  min-width: 80px;
+}
+
+.model-circle:hover {
+  background-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  transform: scale(1.05) translateZ(0);
+}
+
+.model-circle:active,
+.model-circle:focus {
+  outline: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.model-icon {
+  font-size: 12px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: margin;
+}
+
+.model-circle--expanded .model-icon {
+  margin-right: 4px;
+}
+
+.model-name-expanded {
+  font-size: 9px;
+  color: #555;
+  font-weight: 500;
+  margin-right: 2px;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-10px);
+  animation: slideInFade 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  will-change: opacity, transform;
+}
+
+.toggle-arrow {
+  font-size: 8px;
+  color: #777;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-left: 2px;
+  opacity: 0;
+  transform: translateX(-5px);
+  animation: slideInFade 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s forwards;
+  will-change: opacity, transform;
+}
+
+.toggle-arrow--open {
+  transform: rotate(180deg);
+}
+
+@keyframes slideInFade {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.model-dropdown-circle {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(200, 200, 200, 0.8);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(8px);
+  z-index: 1001;
+  min-width: 80px;
+  overflow: hidden;
+  animation: slideDownSmooth 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: top left;
+  will-change: opacity, transform;
+}
+
+@keyframes slideDownSmooth {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.model-option-circle {
+  padding: 6px 8px;
+  cursor: pointer;
+  transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 10px;
+  color: #333;
+  border-bottom: 1px solid rgba(240, 240, 240, 0.5);
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  will-change: background-color;
+}
+
+.model-option-circle:last-child {
+  border-bottom: none;
+}
+
+.model-option-circle:hover {
+  background-color: rgba(248, 249, 250, 0.8);
+}
+
+.model-option-circle--selected {
+  background-color: rgba(33, 150, 243, 0.1);
+  color: #1976d2;
+  font-weight: 500;
+}
+
+/* 输入控制样式 */
 .input-controls {
   display: flex;
   align-items: center;
   margin-top: 10px;
-}
-
-.model-selector {
-  display: flex;
-  align-items: center;
-  padding: 8px 16px;
-  background-color: #f8f9fa;
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  min-width: 140px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.model-selector:hover {
-  background-color: #e9ecef;
-  border-color: #adb5bd;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.model-name {
-  font-size: 14px;
-  color: #333;
-  margin-right: 5px;
-}
-
-.model-arrow {
-  font-size: 12px;
-  color: #666;
-  transition: transform 0.2s ease;
-}
-
-.model-arrow--up {
-  transform: rotate(180deg);
-}
-
-.model-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
-  max-height: 300px;
-  overflow-y: auto;
-  margin-top: 10px;
-  min-width: 150px;
-}
-
-.model-option {
-  padding: 10px 16px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  border-bottom: 1px solid #f0f0f0;
-  display: flex;
-  align-items: center;
-}
-
-.model-option:last-child {
-  border-bottom: none;
-}
-
-.model-option:hover {
-  background-color: #f8f9fa;
-}
-
-.model-option--selected {
-  background-color: #e3f2fd;
-  border-left: 3px solid #2196f3;
-}
-
-.model-option-name {
-  font-weight: 500;
-  color: #333;
-  font-size: 14px;
 }
 </style>
