@@ -42,18 +42,6 @@
           <ul class="m-others g-fs14 u-pt10 u-j-middle" style="justify-content: center">
             <li
               class="f-tc"
-              title="本地或在线图片压缩/转为base64字符串"
-              @click="showCompName = 'ImageCompressor'"
-            >
-              <em class="u-icon iconfont icon-compress-file g-fs36"></em>
-              <span class="g-fs12">图片压缩/base64</span>
-            </li>
-            <li class="f-tc" title="rgb/hxb/hex色值换算" @click="showCompName = 'ColorPass'">
-              <em class="u-icon iconfont icon-chanyexietong g-fs36"></em>
-              <span class="g-fs12">色值换算</span>
-            </li>
-            <li
-              class="f-tc"
               title="人工智能生成内容"
               style="
                 display: flex;

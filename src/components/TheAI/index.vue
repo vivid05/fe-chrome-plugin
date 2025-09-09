@@ -208,12 +208,6 @@ const params = ref({
   },
 });
 
-const updateScroll = () => {
-  nextTick(() => {
-    const scrollHeight = chatBox.value.scrollHeight;
-    chatBox.value.scrollTop = scrollHeight;
-  });
-};
 
 // 获取当前选中的模型信息
 const getCurrentModel = () => {
@@ -282,7 +276,6 @@ const onSend = async () => {
   }
 
   chatList.value.push({ role: 'user', content: userInput.value });
-  updateScroll();
   isLoading.value = true;
   isFinished.value = false; // 重置完成状态
   userInput.value = '';
@@ -346,7 +339,6 @@ const displayCharacter = () => {
   isHandleText.value = true;
   if (charIndex < currentText.length) {
     resultTxt.value += currentText[charIndex];
-    updateScroll();
     charIndex++;
   } else {
     if (isFinished.value || currentText.length === 0) {

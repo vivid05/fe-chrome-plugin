@@ -13,6 +13,7 @@
         v-model="originTxt"
         placeholder="输入或粘贴要翻译的内容"
         class="u-textarea"
+        @blur="onBlur"
       ></textarea>
     </section>
 
@@ -93,19 +94,6 @@ export default defineComponent({
       ],
     };
   },
-  watch: {
-    originTxt(newval, oldval) {
-      if (!newval || newval === oldval) return;
-      if (this.timer) {
-        clearTimeout(this.timer as number);
-      }
-      const DEBOUNCE_TIME = 400;
-
-      this.timer = setTimeout(() => {
-        this.onTranslate(newval);
-      }, DEBOUNCE_TIME);
-    },
-  },
 
   async mounted() {
     const val = getUrlParam('value');
@@ -118,7 +106,9 @@ export default defineComponent({
     stopPropagation() {
       return false;
     },
-
+    onBlur() {
+      this.onTranslate(this.originTxt);
+    },
     /**
      * 重置输入和结果
      */

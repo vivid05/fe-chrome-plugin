@@ -61,18 +61,24 @@ export function getMarkTree(cb: AnyFunc) {
       i--;
     }
   }
+  
   try {
-    chrome.bookmarks.getTree(function (bookmarkArray: any[]) {
-      try {
-        clearUpFavorite(bookmarkArray);
-
-        cb(result);
-      } catch (e) {
-        alert((e as Error)?.message);
-      }
-    });
+    if (typeof chrome !== 'undefined' && chrome.bookmarks && chrome.bookmarks.getTree) {
+      chrome.bookmarks.getTree(function (bookmarkArray: any[]) {
+        try {
+          clearUpFavorite(bookmarkArray);
+          cb(result);
+        } catch (e) {
+          alert((e as Error)?.message);
+        }
+      });
+    } else {
+      // 不在Chrome扩展环境中，返回空数组
+      cb(result);
+    }
   } catch (e) {
     if (IS_DEV) console.error('getMarkTree', e);
     console.warn('not in chrome plugin environment');
+    cb(result);
   }
 }

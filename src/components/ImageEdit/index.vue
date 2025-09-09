@@ -9,20 +9,43 @@
         >
           <icon-reset />
         </em>
-        <img ref="img" style="display: none" :src="imageUrl" alt="" />
+        <img ref="img" :src="imageUrl" alt="" style="max-width: 100%; max-height: 100%; object-fit: contain;" />
       </div>
       <div class="info">
-        <div>
-          <span>宽：</span>
-          <span>{{ imgWidth }}</span>
+        <div class="size-info">
+          <div>
+            <span>宽：</span>
+            <span>{{ imgWidth }}</span>
+          </div>
+          <div>
+            <span>高：</span>
+            <span>{{ imgHeight }}</span>
+          </div>
+          <div>
+            <span>图片大小：</span>
+            <span>{{ imageSize }}KB</span>
+          </div>
         </div>
-        <div>
-          <span>高：</span>
-          <span>{{ imgHeight }}</span>
-        </div>
-        <div>
-          <span>图片大小：</span>
-          <span>{{ imageSize }}KB</span>
+        <div class="crop-inputs">
+          <div class="input-group">
+            <label>裁剪宽度：</label>
+            <input 
+              v-model.number="cropWidth" 
+              type="number" 
+              placeholder="像素"
+              @input="onCropSizeChange"
+            />
+          </div>
+          <div class="input-group">
+            <label>裁剪高度：</label>
+            <input 
+              v-model.number="cropHeight" 
+              type="number" 
+              placeholder="像素"
+              @input="onCropSizeChange"
+            />
+          </div>
+          <button class="crop-btn" @click="applyCropSize">应用尺寸</button>
         </div>
       </div>
       <div class="btns">
@@ -76,8 +99,8 @@ export default {
 </script>
 <script setup>
 import Cropper from 'cropperjs';
-import IconInbox from '../ImageCompressor/IconInbox.vue';
-import IconReset from '../ImageCompressor/IconReset.vue';
+import IconInbox from './IconInbox.vue';
+import IconReset from './IconReset.vue';
 import 'cropperjs/dist/cropper.css';
 import { handleInputUploadImageFile } from '@/utils/image';
 import { nextTick, onUnmounted, ref } from 'vue';
@@ -96,6 +119,8 @@ const imageSize = ref('');
 const cropper = ref();
 const imgWidth = ref(0);
 const imgHeight = ref(0);
+const cropWidth = ref('');
+const cropHeight = ref('');
 
 onUnmounted(() => {
   cropper.value && cropper.value.destroy();
@@ -166,6 +191,43 @@ const onSave = () => {
 const onReset = () => {
   cropper.value.reset();
 };
+
+const onCropSizeChange = () => {
+  // 输入框值变化时的实时反馈
+  if (cropWidth.value && cropHeight.value && cropper.value) {
+    const imageData = cropper.value.getImageData();
+    const canvasData = cropper.value.getCanvasData();
+    
+    // 计算合适的起始位置（居中）
+    const startX = Math.max(0, (imageData.naturalWidth - cropWidth.value) / 2);
+    const startY = Math.max(0, (imageData.naturalHeight - cropHeight.value) / 2);
+    
+    // 确保裁剪尺寸不超过图片尺寸
+    const maxWidth = Math.min(cropWidth.value, imageData.naturalWidth);
+    const maxHeight = Math.min(cropHeight.value, imageData.naturalHeight);
+    
+    cropper.value.setCropBoxData({
+      left: canvasData.left + startX * canvasData.width / imageData.naturalWidth,
+      top: canvasData.top + startY * canvasData.height / imageData.naturalHeight,
+      width: maxWidth * canvasData.width / imageData.naturalWidth,
+      height: maxHeight * canvasData.height / imageData.naturalHeight
+    });
+  }
+};
+
+const applyCropSize = () => {
+  if (!cropWidth.value || !cropHeight.value) {
+    alert('请输入有效的宽度和高度');
+    return;
+  }
+  
+  if (!cropper.value) {
+    alert('请先上传图片');
+    return;
+  }
+  
+  onCropSizeChange();
+};
 </script>
 
 <style scoped>
@@ -173,17 +235,24 @@ const onReset = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  min-height: 100%;
 }
 .main {
   position: relative;
   width: 100%;
-  height: 100%;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 20px;
+  box-sizing: border-box;
 }
 .img-wrapper {
   position: relative;
   width: 100%;
-  min-height: 70%;
+  max-height: 60vh;
+  min-height: 300px;
+  overflow: hidden;
+  margin-bottom: 20px;
 }
 .img-preview {
   position: absolute;
@@ -192,7 +261,11 @@ const onReset = () => {
   width: 20%;
 }
 .btns {
-  margin-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.btns:last-of-type {
+  margin-bottom: 40px;
 }
 .btns > button {
   background: #fff;
@@ -214,9 +287,85 @@ const onReset = () => {
 }
 .info {
   margin: 20px 0 10px 0;
-  width: 350px;
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.size-info {
   display: flex;
   justify-content: space-between;
+  background: #f5f5f5;
+  padding: 10px 15px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.size-info > div {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.crop-inputs {
+  background: #fff;
+  border: 1px solid #dcdfe6;
+  border-radius: 6px;
+  padding: 15px;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+
+.input-group:last-of-type {
+  margin-bottom: 15px;
+}
+
+.input-group label {
+  min-width: 80px;
+  font-size: 14px;
+  color: #606266;
+}
+
+.input-group input {
+  flex: 1;
+  max-width: 120px;
+  padding: 6px 10px;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+.crop-btn {
+  width: 100%;
+  padding: 8px 16px;
+  background-color: #17a2b8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.crop-btn:hover {
+  background-color: #138496;
+}
+
+.crop-btn:active {
+  background-color: #117a8b;
 }
 .close {
   position: absolute;

@@ -57,7 +57,7 @@ async function translateWithAI(targetLang: string, text: string): Promise<string
     const targetLanguage = LANG_MAP[targetLang] || '英文';
 
     const completion = await openai.chat.completions.create({
-      model: 'moonshotai/Kimi-K2-Instruct',
+      model: 'Qwen/Qwen3-32B',
       messages: [
         {
           role: 'system',
@@ -70,6 +70,7 @@ async function translateWithAI(targetLang: string, text: string): Promise<string
       ],
       temperature: 0.3,
       max_tokens: 1000,
+      enable_thinking: false,
     });
 
     return completion.choices[0]?.message?.content?.trim() || '';
